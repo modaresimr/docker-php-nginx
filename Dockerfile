@@ -1,5 +1,5 @@
 FROM alpine:3.14
-LABEL Maintainer="Tim de Pater <code@trafex.nl>"
+LABEL Maintainer="Ali Modaresi"
 LABEL Description="Lightweight container with Nginx 1.20 & PHP 8.0 based on Alpine Linux."
 
 # Install packages and remove default server definition
@@ -29,14 +29,17 @@ RUN apk --no-cache add \
 RUN ln -s /usr/bin/php8 /usr/bin/php
 
 # Configure nginx
-COPY config/nginx.conf /etc/nginx/nginx.conf
+COPY config/nginx.conf /config/nginx.conf
 
 # Configure PHP-FPM
-COPY config/fpm-pool.conf /etc/php8/php-fpm.d/www.conf
-COPY config/php.ini /etc/php8/conf.d/custom.ini
+COPY config/fpm-pool.conf /config/fpm-pool.conf
+COPY config/php.ini /config/php.ini
 
 # Configure supervisord
 COPY config/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+RUN rm -f /etc/nginx/nginx.conf && ln -s /config/nginx.conf /etc/nginx/nginx.conf  &&\
+    rm -f /etc/php8/php-fpm.d/fpm-pool.conf && ln -s /config/fpm-pool.conf /etc/php8/php-fpm.d/fpm-pool.conf  &&\
+    rm -f /etc/php8/conf.d/php.ini && ln -s /config/php.ini /etc/php8/conf.d/php.ini
 
 # Setup document root
 RUN mkdir -p /var/www/html
@@ -55,10 +58,10 @@ WORKDIR /var/www/html
 COPY --chown=nobody src/ /var/www/html/
 
 # Expose the port nginx is reachable on
-EXPOSE 8080
+EXPOSE 80
 
 # Let supervisord start nginx & php-fpm
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
 
 # Configure a healthcheck to validate that everything is up&running
-HEALTHCHECK --timeout=10s CMD curl --silent --fail http://127.0.0.1:8080/fpm-ping
+HEALTHCHECK --timeout=10s CMD curl --silent --fail http://127.0.0.1:80/fpm-ping
