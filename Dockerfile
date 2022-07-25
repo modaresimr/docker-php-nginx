@@ -47,7 +47,7 @@ COPY config/php.ini /config/php.ini
 # Configure supervisord
 COPY config/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 RUN rm -f /etc/nginx/nginx.conf && ln -s /config/nginx.conf /etc/nginx/nginx.conf  &&\
-    rm -f /etc/php81/php-fpm.d/fpm-pool.conf && ln -s /config/fpm-pool.conf /etc/php81/php-fpm.d/fpm-pool.conf  &&\
+    rm -f /etc/php81/php-fpm.d/www.conf && ln -s /config/fpm-pool.conf /etc/php81/php-fpm.d/fpm-pool.conf  &&\
     rm -f /etc/php81/conf.d/php.ini && ln -s /config/php.ini /etc/php81/conf.d/php.ini
 
 # Setup document root
@@ -59,7 +59,6 @@ RUN chown -R nobody.nobody /var/www/html /run /var/lib/nginx /var/log/nginx
 USER nobody
 
 # Add application
-WORKDIR /var/www/html
 COPY --chown=nobody src/ /var/www/html/
 
 # Expose the port nginx is reachable on
