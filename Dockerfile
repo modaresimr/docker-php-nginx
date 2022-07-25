@@ -23,10 +23,18 @@ RUN apk --no-cache add \
   php8-xml \
   php8-xmlreader \
   php8-zlib \
-  supervisor
+  php8-zip\
+  php8-exif\
+#  imagemagick-dev imagemagick\
+  php8-pecl-imagick\
+  php8-fileinfo\
+  supervisor \
+  gnu-libiconv \
+  php8-iconv
 
 # Create symlink so programs depending on `php` still function
-RUN ln -s /usr/bin/php8 /usr/bin/php
+RUN ln -s /usr/bin/php8 /usr/bin/php 
+	
 
 # Configure nginx
 COPY config/nginx.conf /config/nginx.conf
