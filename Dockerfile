@@ -1,40 +1,41 @@
-FROM alpine:3.14
+ARG ALPINE_VERSION=3.16
+FROM alpine:${ALPINE_VERSION}
 LABEL Maintainer="Ali Modaresi"
-LABEL Description="Lightweight container with Nginx 1.20 & PHP 8.0 based on Alpine Linux."
+LABEL Description="Lightweight container with Nginx 1.22 & PHP 8.1 based on Alpine Linux."
+# Setup document root
+WORKDIR /var/www/html
 
 # Install packages and remove default server definition
-RUN apk --no-cache add \
+RUN apk add --no-cache \
   curl \
   nginx \
-  php8 \
-  php8-ctype \
-  php8-curl \
-  php8-dom \
-  php8-fpm \
-  php8-gd \
-  php8-intl \
-  php8-json \
-  php8-mbstring \
-  php8-mysqli \
-  php8-opcache \
-  php8-openssl \
-  php8-phar \
-  php8-session \
-  php8-xml \
-  php8-xmlreader \
-  php8-zlib \
-  php8-zip\
-  php8-exif\
+  php81 \
+  php81-ctype \
+  php81-curl \
+  php81-dom \
+  php81-fpm \
+  php81-gd \
+  php81-intl \
+  php81-mbstring \
+  php81-mysqli \
+  php81-opcache \
+  php81-openssl \
+  php81-phar \
+  php81-session \
+  php81-xml \
+  php81-xmlreader \
+  php81-zlib \
+  php81-zip\
+  php81-exif\
 #  imagemagick-dev imagemagick\
-  php8-pecl-imagick\
-  php8-fileinfo\
+  php81-pecl-imagick\
+  php81-fileinfo\
   supervisor \
   gnu-libiconv \
-  php8-iconv
+  php81-iconv
 
 # Create symlink so programs depending on `php` still function
-RUN ln -s /usr/bin/php8 /usr/bin/php 
-	
+RUN ln -s /usr/bin/php81 /usr/bin/php
 
 # Configure nginx
 COPY config/nginx.conf /config/nginx.conf
@@ -51,12 +52,8 @@ RUN rm -f /etc/nginx/nginx.conf && ln -s /config/nginx.conf /etc/nginx/nginx.con
 
 # Setup document root
 RUN mkdir -p /var/www/html
-
 # Make sure files/folders needed by the processes are accessable when they run under the nobody user
-RUN chown -R nobody.nobody /var/www/html && \
-  chown -R nobody.nobody /run && \
-  chown -R nobody.nobody /var/lib/nginx && \
-  chown -R nobody.nobody /var/log/nginx
+RUN chown -R nobody.nobody /var/www/html /run /var/lib/nginx /var/log/nginx
 
 # Switch to use a non-root user from here on
 USER nobody
